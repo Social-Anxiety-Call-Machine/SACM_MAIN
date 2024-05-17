@@ -11,18 +11,19 @@ pip3 install --upgrade openai
 import assemblyai as aai
 from elevenlabs import generate, stream
 from openai import OpenAI
+import os
 
 class AI_Assistant:
     def __init__(self):
-        aai.settings.api_key = "ASSEMBLYAI-API-KEY"
-        self.openai_client = OpenAI(api_key = "OPENAI-API-KEY")
-        self.elevenlabs_api_key = "ELEVENLABS-API-KEY"
-
+        aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
+        self.openai_client = OpenAI(api_key = os.getenv('OPENAI_API_KEY'))
+        self.elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
+        print(aai.settings.api_key)
         self.transcriber = None
 
         # Prompt
         self.full_transcript = [
-            {"role":"system", "content":"You are a receptionist at a dental clinic. Be resourceful and efficient."},
+            {"role":"system", "content":"You are a receptionist at a dental clinic. Be resourceful and efficient. You only talk in german."},
         ]
 
 ###### Step 2: Real-Time Transcription with AssemblyAI ######
@@ -108,7 +109,7 @@ class AI_Assistant:
 
         stream(audio_stream)
 
-greeting = "Thank you for calling Vancouver dental clinic. My name is Sandy, how may I assist you?"
+greeting = "Thank you for calling Vancouver dental clinic. My name is Sandy, how may I assist you? I only talk in german!"
 ai_assistant = AI_Assistant()
 ai_assistant.generate_audio(greeting)
 ai_assistant.start_transcription()
