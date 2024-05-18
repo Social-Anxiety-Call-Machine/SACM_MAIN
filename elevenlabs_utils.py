@@ -11,6 +11,7 @@ class ElevenLabsUtils:
         voice_response = self.client.voices.get_all()
         audio_stream = self.client.text_to_speech.convert_as_stream(
             text=text,
-            voice_id="VC9NHIQryLjTvEtbF4kj"
+            voice_id="VC9NHIQryLjTvEtbF4kj",
+            model_id="eleven_multilingual_v2"
         )
         stream(audio_stream)
