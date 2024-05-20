@@ -1,33 +1,57 @@
-from openai_utils import OpenAIUtils
-from elevenlabs_utils import ElevenLabsUtils
-from transcription_utils import Transcription
+import time
 
 class AI_Assistant:
-    def __init__(self):
-        self.transcription = Transcription(self)
-        self.openai_utils = OpenAIUtils()
-        self.elevenlabs_utils = ElevenLabsUtils()
-        self.transcribing = False
+    def __init__(self, stt, llm, tts, prompt):
+        self.stt = stt
+        self.llm = llm
+        self.tts = tts
+        self.prompt = prompt
         self.full_transcript = [
-            {"role": "system", "content": """
-            Du rufst in einer Pizzeria an und möchtest eine Pizza Schinken bestellen. Deine Adresse lautet: Bahnhofstraße 1, Musterstadt.
-            Du bist sehr freundlich und antwortest auf die Fragen des Mitarbeiters. Du möchtest die Pizza geliefert haben. 
-            Außerdem antwortest du kurz und präzise auf die Fragen des Mitarbeiters.
-            Dein Name ist Max Mustermann.
-            """
-            },
+            {"role": "system", "content": prompt},
         ]
 
-    def generate_ai_response(self, transcript):
-        #print("Generating AI response...")
-        self.transcription.stop_transcription()
 
+    def start_conversation(self):
+        greeting = "Hallo! Ich würde gerne eine Pizza bestellen."
+        self.full_transcript.append({"role": "assistant", "content": greeting})
+        self.tts.generateSpeech(greeting)
+        
+        while True:
+            self.execute_stt()
+            answer = self.execute_llm()
+            self.execute_tts(answer)
+        
+        return self.end_conversation()
+
+    def execute_stt(self):
+        start_time = time.time()
+        transcript = self.stt.generateText()
+        end_time = time.time()
+        print(f"STT execution time: {end_time - start_time} seconds")
+        
         self.full_transcript.append({"role": "user", "content": transcript})
         print(f"User: {transcript}")
 
-        ai_response = self.openai_utils.generate_response(self.full_transcript)
+        return transcript
 
-        self.full_transcript.append({"role": "assistant", "content": ai_response})
+    def execute_llm(self):
+        start_time = time.time()
+        answer = self.llm.generateAnswer(self.full_transcript)
+        end_time = time.time()
+        print(f"LLM execution time: {end_time - start_time} seconds")
+        
+        self.full_transcript.append({"role": "assistant", "content": answer})
 
-        self.elevenlabs_utils.generate_audio(ai_response)
-        self.transcription.start_transcription()
+        return answer
+
+    def execute_tts(self, answer):
+        start_time = time.time()
+        self.tts.generateSpeech(answer)
+        end_time = time.time()
+        print(f"TTS execution time: {end_time - start_time} seconds")
+
+
+    def end_conversation(self):
+        #Calender, Mail ...
+
+        return self.full_transcript

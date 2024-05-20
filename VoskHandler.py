@@ -1,16 +1,15 @@
 import json
 from vosk import Model, KaldiRecognizer
 from audio_utils import start_audio_stream, read_audio_data
+from interfaces import SpeechToText
 
-class Transcription:
-    def __init__(self, assistant):
-        self.assistant = assistant
-        model_path = "vosk-model-small-de-0.15"
-        self.model = Model(model_path)
+class VoskModel(SpeechToText):
+    def __init__(self, modelPath):
+        self.model = Model(modelPath)
         self.recognizer = KaldiRecognizer(self.model, 16000)
         self.transcribing = False
 
-    def start_transcription(self):
+    def generateText(self):
         self.transcribing = True
         print("Starting transcription...")
         stream = start_audio_stream()
@@ -28,7 +27,6 @@ class Transcription:
                 text = result["text"]
                 if text:
                     print("Transcript:", text)
-                    self.assistant.full_transcript.append({"role": "user", "content": text})
                     speech_detected = True
                     silence_duration = 0
             else:
@@ -36,11 +34,13 @@ class Transcription:
                     silence_duration += 4000 / 16000 * 1000
                     if silence_duration >= silence_threshold:
                         print("Silence detected")
-                        self.assistant.generate_ai_response(text)
+                        self.stop_transcription()
                         break
                     else:
                         #print("Waiting for speech...")
                         pass
+        return text    
+    
 
     def stop_transcription(self):
         self.transcribing = False
