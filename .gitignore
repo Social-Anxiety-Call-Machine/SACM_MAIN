@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 setSecrets.sh
+
+vosk-model-de-0.21
