@@ -1,4 +1,4 @@
-import json
+import json, time
 from vosk import Model, KaldiRecognizer
 from audio_utils import start_audio_stream, read_audio_data
 from interfaces import SpeechToText
@@ -8,8 +8,12 @@ class VoskModel(SpeechToText):
         self.model = Model(modelPath)
         self.recognizer = KaldiRecognizer(self.model, 16000)
         self.transcribing = False
+        self.time = -1
 
     def generateText(self):
+        startTime = time.time()
+        firstBit = False
+
         self.transcribing = True
         print("Starting transcription...")
         stream = start_audio_stream()
@@ -22,6 +26,9 @@ class VoskModel(SpeechToText):
             data = read_audio_data(stream)
             if len(data) == 0:
                 break
+            if not firstBit:
+                self.time = time.time() - startTime
+                firstBit = True
             if self.recognizer.AcceptWaveform(data):
                 result = json.loads(self.recognizer.Result())
                 text = result["text"]
