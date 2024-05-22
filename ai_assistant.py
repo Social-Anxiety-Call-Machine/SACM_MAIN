@@ -1,4 +1,7 @@
 import time
+import threading
+import os
+import random
 
 class AI_Assistant:
     def __init__(self, stt, llm, tts, prompt):
@@ -18,21 +21,33 @@ class AI_Assistant:
         
         while True:
             self.execute_stt()
-            answer = self.execute_llm()
-            self.execute_tts(answer)
+
+            #wahrscheinlich auch über embedding lösen
+            if self.full_transcript[-1]["role"] == "user": 
+                if "wiedersehen" in self.full_transcript[-1]["content"].lower():
+                    break
+
+            embAnswer = self.checkEmbedding() # not used yet - returns true
+            if embAnswer:
+                self.execute_tts(embAnswer)
+            else:
+                threading.Thread(target=self.execute_llm).start()
+                while threading.active_count() > 1:
+                    time.sleep(1)
+                    self.playFiller()
+                    self.playFiller()
+
+                self.execute_llm()
+                self.execute_tts()    
         
         return self.end_conversation()
 
     def execute_stt(self):
-        start_time = time.time()
         transcript = self.stt.generateText()
-        end_time = time.time()
-        print(f"STT execution time: {end_time - start_time} seconds")
+    
+        print(f"STT execution time: {self.stt.time} seconds")
         
         self.full_transcript.append({"role": "user", "content": transcript})
-        print(f"User: {transcript}")
-
-        return transcript
 
     def execute_llm(self):
         start_time = time.time()
@@ -42,14 +57,20 @@ class AI_Assistant:
         
         self.full_transcript.append({"role": "assistant", "content": answer})
 
-        return answer
+    def execute_tts(self):
+        self.tts.generateSpeech(self.full_transcript[-1]["content"])
 
-    def execute_tts(self, answer):
-        start_time = time.time()
-        self.tts.generateSpeech(answer)
-        end_time = time.time()
-        print(f"TTS execution time: {end_time - start_time} seconds")
+        #print(f"TTS execution time: {self.tts.time} seconds")
 
+    def checkEmbedding(self):
+        return False
+    
+    def playFiller(self):
+        filler_folder = os.path.join(os.path.dirname(__file__), "filler")
+        filler_files = os.listdir(filler_folder)
+        filler_file_path = os.path.join(filler_folder, random.choice(filler_files))
+
+        self.tts.playAudio(filler_file_path)
 
     def end_conversation(self):
         #Calender, Mail ...
