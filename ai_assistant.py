@@ -27,7 +27,7 @@ class AI_Assistant:
                 if "wiedersehen" in self.full_transcript[-1]["content"].lower():
                     break
 
-            embAnswer = self.checkEmbedding() # not used yet - returns true
+            embAnswer = self.checkEmbedding() # not used yet - returns False
             if embAnswer:
                 self.execute_tts(embAnswer)
             else:
