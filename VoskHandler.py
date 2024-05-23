@@ -3,7 +3,7 @@ from vosk import Model, KaldiRecognizer
 from audio_utils import start_audio_stream, read_audio_data
 from interfaces import SpeechToText
 
-class VoskModel(SpeechToText):
+class VoskHandler(SpeechToText):
     def __init__(self, modelPath):
         self.model = Model(modelPath)
         self.recognizer = KaldiRecognizer(self.model, 16000)

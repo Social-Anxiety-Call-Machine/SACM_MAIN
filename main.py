@@ -1,5 +1,5 @@
-from ElevenLabsHandler import ElevenLabsUtils
-from ElevenLabsHandlerWOLib import ElevenLabsUtilsWOLib
+from ElevenLabsHandler import ElevenLabsHandler
+from ElevenLabsHandlerWOLib import ElevenLabsHandlerWOLib
 from OpenaiHandler import OpenAIModel
 from VoskHandler import VoskModel
 from groqHandler import GroqModel
@@ -13,8 +13,8 @@ if __name__ == "__main__":
 
     stt = VoskModel("vosk-model-small-de-0.15")
     llm = OpenAIModel()
-    #tts = ElevenLabsUtils(voice_id= "VC9NHIQryLjTvEtbF4kj", model_id="eleven_multilingual_v2")
-    tts = ElevenLabsUtilsWOLib(voice_id= "VC9NHIQryLjTvEtbF4kj", model_id="eleven_multilingual_v2")
+    #tts = ElevenLabsHandler(voice_id= "VC9NHIQryLjTvEtbF4kj", model_id="eleven_multilingual_v2")
+    tts = ElevenLabsHandlerWOLib(voice_id= "VC9NHIQryLjTvEtbF4kj", model_id="eleven_multilingual_v2")
 
     ai_assistant = AI_Assistant(stt, llm, tts, prompt)
 

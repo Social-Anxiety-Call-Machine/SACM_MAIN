@@ -3,7 +3,7 @@ from elevenlabs import stream, play
 from elevenlabs.client import ElevenLabs
 from interfaces import TextToSpeech
 
-class ElevenLabsUtils(TextToSpeech):
+class ElevenLabsHandler(TextToSpeech):
     def __init__(self, model_id, voice_id):
         self.api_key = os.getenv("ELEVENLABS_API_KEY")
         self.client = ElevenLabs(api_key=self.api_key)

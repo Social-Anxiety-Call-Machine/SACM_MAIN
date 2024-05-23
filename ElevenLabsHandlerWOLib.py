@@ -5,7 +5,7 @@ from interfaces import TextToSpeech
 import subprocess, shutil
 from typing import Iterator
 
-class ElevenLabsUtilsWOLib(TextToSpeech):
+class ElevenLabsHandlerWOLib(TextToSpeech):
     def __init__(self, model_id, voice_id):
         self.api_key = os.getenv("ELEVENLABS_API_KEY")
         #self.client = ElevenLabs(api_key=self.api_key)
