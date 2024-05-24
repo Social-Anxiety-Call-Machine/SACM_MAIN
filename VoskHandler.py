@@ -33,7 +33,7 @@ class VoskHandler(SpeechToText):
                 result = json.loads(self.recognizer.Result())
                 text = result["text"]
                 if text:
-                    print("Transcript:", text)
+                    print("User:", text)
                     speech_detected = True
                     silence_duration = 0
             else:

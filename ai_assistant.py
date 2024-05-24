@@ -45,11 +45,15 @@ class AI_Assistant:
     async def execute_llm_tts(self):
         answer = await self.llm.generateAnswer(self.full_transcript)
         print(f"LLM execution time: {self.llm.time} seconds")
+    
+        self.playFiller()
 
         await self.tts.text_to_speech_input_streaming(answer)
         print(f"TTS execution time: {self.tts.time} seconds")
 
-        # add answer to transcript
+        transcript = "".join(self.llm.transcript)
+        self.full_transcript.append({"role": "assistant", "content": transcript})
+        print("Assistant: " + transcript)
 
     def checkEmbedding(self):
         return False

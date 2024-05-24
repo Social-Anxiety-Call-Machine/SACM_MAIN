@@ -9,8 +9,12 @@ class GroqModel:
         self.stream = stream
         self.first = False
         self.time = -1
+        self.transcript = []
 
     async def generateAnswer(self, transcript):
+        self.first = False
+        self.transcript = []
+        
         startTime = time.time()
         response = await self.client.chat.completions.create(
             messages = transcript,
@@ -25,6 +29,7 @@ class GroqModel:
                     if not self.first:
                         self.time = time.time() - startTime
                         self.first = True
+                    self.transcript.append(delta.content)
                     yield delta.content
 
         return text_iterator()
