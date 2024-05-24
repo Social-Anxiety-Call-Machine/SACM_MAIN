@@ -60,14 +60,14 @@ class AI_Assistant:
     def execute_tts(self):
         self.tts.generateSpeech(self.full_transcript[-1]["content"])
 
-        #print(f"TTS execution time: {self.tts.time} seconds")
+        print(f"TTS execution time: {self.tts.time} seconds")
 
     def checkEmbedding(self):
         return False
     
     def playFiller(self):
         filler_folder = os.path.join(os.path.dirname(__file__), "filler")
-        filler_files = os.listdir(filler_folder)
+        filler_files = [f for f in os.listdir(filler_folder) if os.path.isfile(os.path.join(filler_folder, f))]
         filler_file_path = os.path.join(filler_folder, random.choice(filler_files))
 
         self.tts.playAudio(filler_file_path)
