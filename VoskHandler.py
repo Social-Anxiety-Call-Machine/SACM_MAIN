@@ -19,7 +19,7 @@ class VoskHandler(SpeechToText):
         stream = start_audio_stream()
 
         speech_detected = False
-        silence_threshold = 1000
+        silence_threshold = 400
         silence_duration = 0
 
         while self.transcribing:
@@ -33,7 +33,7 @@ class VoskHandler(SpeechToText):
                 result = json.loads(self.recognizer.Result())
                 text = result["text"]
                 if text:
-                    print("Transcript:", text)
+                    print("User:", text)
                     speech_detected = True
                     silence_duration = 0
             else:

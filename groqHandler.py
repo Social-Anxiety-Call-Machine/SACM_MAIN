@@ -1,37 +1,36 @@
-from groq import Groq
-import os
-
+from groq import AsyncGroq
+import os, time
 
 #groq models: https://console.groq.com/docs/models
 class GroqModel:
     def __init__(self, groqmodel, stream):
         self.groqModel = groqmodel
-        self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        self.client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY"))
         self.stream = stream
+        self.first = False
+        self.time = -1
+        self.transcript = []
 
-    # Streaming
-    def generateAnswer(self, transcript):
-        stream = self.client.chat.completions.create(
+    async def generateAnswer(self, transcript):
+        self.first = False
+        self.transcript = []
+
+        startTime = time.time()
+        response = await self.client.chat.completions.create(
             messages = transcript,
             model = self.groqModel,
-            stop = None,
-            stream = self.stream
+            stream = True
         )
+        self.time = time.time() - startTime
+        
+        async def text_iterator():
+            async for chunk in response:
+                delta = chunk.choices[0].delta
+                if delta.content is not None:
+                    # if not self.first:
+                    #     self.time = time.time() - startTime
+                    #     self.first = True
+                    self.transcript.append(delta.content)
+                    yield delta.content
 
-        if self.stream:
-            for chunk in stream:
-                print(chunk.choies[0].delta.content, end="")
-        print(stream)        
-        return stream.choices[0].message.content
-            
-"""
-    def batch(self, transcript):
-        chat = ChatGroq(temperature=0, model_name=self.groqModel, groq_api_key=self.GroqApiKey)
-
-        system = "You are a helpful assistant."
-        human = "{text}"
-        prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-
-        chain = prompt | chat
-        print(chain.invoke({"text": "Explain the importance of low latency LLMs."}))
-"""
+        return text_iterator()
