@@ -14,21 +14,22 @@ class GroqModel:
     async def generateAnswer(self, transcript):
         self.first = False
         self.transcript = []
-        
+
         startTime = time.time()
         response = await self.client.chat.completions.create(
             messages = transcript,
-            model = "llama3-70b-8192",
+            model = self.groqModel,
             stream = True
         )
+        self.time = time.time() - startTime
         
         async def text_iterator():
             async for chunk in response:
                 delta = chunk.choices[0].delta
                 if delta.content is not None:
-                    if not self.first:
-                        self.time = time.time() - startTime
-                        self.first = True
+                    # if not self.first:
+                    #     self.time = time.time() - startTime
+                    #     self.first = True
                     self.transcript.append(delta.content)
                     yield delta.content
 

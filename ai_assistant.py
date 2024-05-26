@@ -1,5 +1,3 @@
-import time
-import threading
 import os
 import random
 import asyncio
@@ -44,12 +42,14 @@ class AI_Assistant:
 
     async def execute_llm_tts(self):
         answer = await self.llm.generateAnswer(self.full_transcript)
-        print(f"LLM execution time: {self.llm.time} seconds")
-    
-        self.playFiller()
+            
+        #fill = self.playFiller()
 
         await self.tts.text_to_speech_input_streaming(answer)
+
+        print(f"LLM execution time: {self.llm.time} seconds")
         print(f"TTS execution time: {self.tts.time} seconds")
+
 
         transcript = "".join(self.llm.transcript)
         self.full_transcript.append({"role": "assistant", "content": transcript})
@@ -58,7 +58,7 @@ class AI_Assistant:
     def checkEmbedding(self):
         return False
     
-    def playFiller(self):
+    async def playFiller(self):
         filler_folder = os.path.join(os.path.dirname(__file__), "filler")
         filler_files = [f for f in os.listdir(filler_folder) if os.path.isfile(os.path.join(filler_folder, f))]
         filler_file_path = os.path.join(filler_folder, random.choice(filler_files))

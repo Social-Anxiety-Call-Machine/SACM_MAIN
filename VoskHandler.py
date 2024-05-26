@@ -19,7 +19,7 @@ class VoskHandler(SpeechToText):
         stream = start_audio_stream()
 
         speech_detected = False
-        silence_threshold = 1000
+        silence_threshold = 400
         silence_duration = 0
 
         while self.transcribing:
