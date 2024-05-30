@@ -66,7 +66,7 @@ async def stream(audio_stream):
 
 async def text_to_speech_input_streaming(voice_id, text_iterator):
     """Send text to ElevenLabs API and stream the returned audio."""
-    uri = f"wss://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream-input?model_id=eleven_turbo_v2"
+    uri = f"wss://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream-input?model_id=eleven_multilingual_v2"
 
     async with websockets.connect(uri) as websocket:
         await websocket.send(json.dumps({

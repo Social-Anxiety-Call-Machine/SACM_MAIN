@@ -1,8 +1,6 @@
-import time
-import threading
 import os
 import random
-
+import asyncio
 class AI_Assistant:
     def __init__(self, stt, llm, tts, prompt):
         self.stt = stt
@@ -31,14 +29,7 @@ class AI_Assistant:
             if embAnswer:
                 self.execute_tts(embAnswer)
             else:
-                threading.Thread(target=self.execute_llm).start()
-                while threading.active_count() > 1:
-                    time.sleep(1)
-                    self.playFiller()
-                    self.playFiller()
-
-                self.execute_llm()
-                self.execute_tts()    
+                asyncio.run(self.execute_llm_tts())
         
         return self.end_conversation()
 
@@ -49,23 +40,25 @@ class AI_Assistant:
         
         self.full_transcript.append({"role": "user", "content": transcript})
 
-    def execute_llm(self):
-        start_time = time.time()
-        answer = self.llm.generateAnswer(self.full_transcript)
-        end_time = time.time()
-        print(f"LLM execution time: {end_time - start_time} seconds")
-        
-        self.full_transcript.append({"role": "assistant", "content": answer})
+    async def execute_llm_tts(self):
+        answer = await self.llm.generateAnswer(self.full_transcript)
+            
+        #fill = self.playFiller()
 
-    def execute_tts(self):
-        self.tts.generateSpeech(self.full_transcript[-1]["content"])
+        await self.tts.text_to_speech_input_streaming(answer)
 
+        print(f"LLM execution time: {self.llm.time} seconds")
         print(f"TTS execution time: {self.tts.time} seconds")
+
+
+        transcript = "".join(self.llm.transcript)
+        self.full_transcript.append({"role": "assistant", "content": transcript})
+        print("Assistant: " + transcript)
 
     def checkEmbedding(self):
         return False
     
-    def playFiller(self):
+    async def playFiller(self):
         filler_folder = os.path.join(os.path.dirname(__file__), "filler")
         filler_files = [f for f in os.listdir(filler_folder) if os.path.isfile(os.path.join(filler_folder, f))]
         filler_file_path = os.path.join(filler_folder, random.choice(filler_files))

@@ -1,10 +1,12 @@
 import time, os
 
 class FileHandler:
+    @classmethod
     def readText(self, filename):
         with open(filename, "r") as file:
             return file.read()
 
+    @classmethod
     def writeText(self, filename, content):
         try:
             with open(filename, "x") as file:
@@ -18,6 +20,7 @@ class FileHandler:
         else:
             print(f"The file '{filename}' was created successfully.")
 
+    @classmethod
     def writeFullTranscript(self, filename, full_transcript):
         try:
             with open(filename, "x") as file:
