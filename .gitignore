@@ -164,6 +164,10 @@ setSecrets.sh
 
 #ignore big vosk model
 vosk-model-de-0.21
+vosk-model-small-de-0.15
+
+#BenTwilioTest
+Twilio_streaming
 
 #main file for testing reasons
 test.py

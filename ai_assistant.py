@@ -2,15 +2,15 @@ import os
 import random
 import asyncio
 class AI_Assistant:
-    def __init__(self, stt, llm, tts, prompt):
+    def __init__(self, stt, llm, tts, emd, prompt):
         self.stt = stt
         self.llm = llm
         self.tts = tts
+        self.emd = emd
         self.prompt = prompt
         self.full_transcript = [
             {"role": "system", "content": prompt},
         ]
-
 
     def start_conversation(self):
         greeting = "Hallo! Ich würde gerne eine Pizza bestellen."
@@ -25,9 +25,10 @@ class AI_Assistant:
                 if "wiedersehen" in self.full_transcript[-1]["content"].lower():
                     break
 
-            embAnswer = self.checkEmbedding() # not used yet - returns False
+            embAnswer = self.checkEmbedding() 
             if embAnswer:
-                self.execute_tts(embAnswer)
+                embAnswerwith_ = embAnswer.replace(" ", "_")
+                self.tts.playAudio(f"embedding/embedding_audio/{embAnswerwith_}.mp3")
             else:
                 asyncio.run(self.execute_llm_tts())
         
@@ -56,7 +57,12 @@ class AI_Assistant:
         print("Assistant: " + transcript)
 
     def checkEmbedding(self):
-        return False
+        best_response = self.emd.get_embedding(self.full_transcript[-1]["content"])
+
+        if best_response is None:
+            return False
+        else: 
+            return best_response
     
     async def playFiller(self):
         filler_folder = os.path.join(os.path.dirname(__file__), "filler")
