@@ -12,7 +12,6 @@ class AI_Assistant:
             {"role": "system", "content": prompt},
         ]
 
-
     def start_conversation(self):
         greeting = "Hallo! Ich würde gerne eine Pizza bestellen."
         self.full_transcript.append({"role": "assistant", "content": greeting})
@@ -26,9 +25,10 @@ class AI_Assistant:
                 if "wiedersehen" in self.full_transcript[-1]["content"].lower():
                     break
 
-            embAnswer = self.checkEmbedding() # not used yet - returns False
+            embAnswer = self.checkEmbedding() 
             if embAnswer:
-                self.tts.generateSpeech(embAnswer)
+                embAnswerwith_ = embAnswer.replace(" ", "_")
+                self.tts.playAudio(f"embedding/embedding_audio/{embAnswerwith_}.mp3")
             else:
                 asyncio.run(self.execute_llm_tts())
         
