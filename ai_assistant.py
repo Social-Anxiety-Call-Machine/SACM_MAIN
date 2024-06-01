@@ -25,12 +25,7 @@ class AI_Assistant:
                 if "wiedersehen" in self.full_transcript[-1]["content"].lower():
                     break
 
-            embAnswer = self.checkEmbedding() 
-            if embAnswer:
-                embAnswerwith_ = embAnswer.replace(" ", "_")
-                self.tts.playAudio(f"embedding/embedding_audio/{embAnswerwith_}.mp3")
-            else:
-                asyncio.run(self.execute_llm_tts())
+            asyncio.run(self.EmbeddingOrLLm())
         
         return self.end_conversation()
 
@@ -44,25 +39,33 @@ class AI_Assistant:
     async def execute_llm_tts(self):
         answer = await self.llm.generateAnswer(self.full_transcript)
             
-        #fill = self.playFiller()
+        #llm_task = asyncio.create_task(self.playFiller()) #jo glaube klappt, aber eh falsche stimme und so
 
         await self.tts.text_to_speech_input_streaming(answer)
 
         print(f"LLM execution time: {self.llm.time} seconds")
         print(f"TTS execution time: {self.tts.time} seconds")
 
+        #await llm_task
 
         transcript = "".join(self.llm.transcript)
         self.full_transcript.append({"role": "assistant", "content": transcript})
         print("Assistant: " + transcript)
 
+    async def EmbeddingOrLLm(self):
+        llm_task = asyncio.create_task(self.execute_llm_tts())
+
+        embAnswer = self.checkEmbedding() 
+        if embAnswer:
+            llm_task.cancel()
+            await self.playEmbeddingSound(embAnswer)
+        else:
+            await llm_task
+
     def checkEmbedding(self):
         best_response = self.emd.get_embedding(self.full_transcript[-1]["content"])
 
-        if best_response is None:
-            return False
-        else: 
-            return best_response
+        return best_response
     
     async def playFiller(self):
         filler_folder = os.path.join(os.path.dirname(__file__), "filler")
@@ -70,6 +73,11 @@ class AI_Assistant:
         filler_file_path = os.path.join(filler_folder, random.choice(filler_files))
 
         self.tts.playAudio(filler_file_path)
+
+    async def playEmbeddingSound(self, embAnswer):
+        embAnswerwith_ = embAnswer.replace(" ", "_")
+        
+        self.tts.playAudio(f"embedding/embedding_audio/{embAnswerwith_}.mp3")
 
     def end_conversation(self):
         #Calender, Mail ...
